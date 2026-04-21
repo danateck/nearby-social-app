@@ -7,8 +7,7 @@ const navItems = [
   { to: '/nearby', label: 'Nearby', icon: Compass },
   { to: '/friends', label: 'Friends', icon: UserRound },
   { to: '/chats', label: 'Chats', icon: MessageCircle },
-  { to: '/groups', label: 'Groups', icon: Users },
-  { to: '/stories', label: 'Stories', icon: Camera }
+  { to: '/groups', label: 'Groups', icon: Users }
 ];
 
 export default function Layout() {

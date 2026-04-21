@@ -8,9 +8,9 @@ import NearbyPage from './pages/NearbyPage';
 import FriendsPage from './pages/FriendsPage';
 import ChatsPage from './pages/ChatsPage';
 import GroupsPage from './pages/GroupsPage';
-import StoriesPage from './pages/StoriesPage';
+import type { ReactElement } from 'react';
 
-function ProtectedRoute({ children }: { children: JSX.Element }) {
+function ProtectedRoute({ children }: { children: ReactElement }) {
   const { user, loading } = useAuth();
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
@@ -36,7 +36,6 @@ export default function App() {
         <Route path="friends" element={<FriendsPage />} />
         <Route path="chats" element={<ChatsPage />} />
         <Route path="groups" element={<GroupsPage />} />
-        <Route path="stories" element={<StoriesPage />} />
       </Route>
     </Routes>
   );

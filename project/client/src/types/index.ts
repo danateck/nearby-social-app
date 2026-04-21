@@ -44,8 +44,9 @@ export type Story = {
   imageUrl: string;
   createdAt: number;
   expiresAt: number;
+  viewedBy?: string[];
+  mediaType?: 'image' | 'video';
 };
-
 export type Chat = {
   id: string;
   title: string;
