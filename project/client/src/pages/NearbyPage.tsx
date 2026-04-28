@@ -119,18 +119,6 @@ export default function NearbyPage() {
           Browser web apps cannot silently detect all nearby phones. This page uses geolocation and shared presence to find people who also opted in.
         </div>
 
-        <div className="mt-4 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700 space-y-1">
-          <div><strong>Debug:</strong></div>
-          <div>Visibility: {enabled ? 'ON' : 'OFF'}</div>
-          <div>
-            Latitude: {position ? position.coords.latitude : 'No location yet'}
-          </div>
-          <div>
-            Longitude: {position ? position.coords.longitude : 'No location yet'}
-          </div>
-          <div>Nearby count: {nearby.length}</div>
-          {geoError && <div className="text-red-600">Location error: {geoError}</div>}
-        </div>
       </Card>
 
       <Card title="People around you" subtitle="Approximate real-time results under 15 meters">

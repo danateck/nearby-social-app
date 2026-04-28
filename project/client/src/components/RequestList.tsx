@@ -15,7 +15,9 @@ export default function RequestList({
 
   return (
     <div className="space-y-3">
-      {items.map((item) => (
+      {items
+  .filter((item) => item.status === 'pending')
+  .map((item) => (
         <div key={item.id} className="flex items-center justify-between rounded-2xl border p-4">
           <div>
             <div className="font-semibold text-slate-900">{item.fromUserName}</div>

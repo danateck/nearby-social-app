@@ -1,63 +1,98 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
-import ChatWindow from '../components/ChatWindow';
 import { useAuth } from '../context/AuthContext';
-import { Chat, Message } from '../types';
-import { createDirectChat, sendMessage, subscribeToChats, subscribeToMessages } from '../services/chatService';
+import { Chat } from '../types';
+import { subscribeToChats, createDirectChat } from '../services/chatService';
+import { subscribeToFriends, type FriendItem } from '../services/friendService';
 
 export default function ChatsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [chats, setChats] = useState<Chat[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<string>('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [friends, setFriends] = useState<FriendItem[]>([]);
+  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
-    const unsub = subscribeToChats((items) => {
-      setChats(items);
-      if (!selectedChatId && items[0]) setSelectedChatId(items[0].id);
-    });
+    const unsub = subscribeToChats(setChats);
     return unsub;
-  }, [selectedChatId]);
+  }, []);
 
   useEffect(() => {
-    if (!selectedChatId) return;
-    return subscribeToMessages(selectedChatId, setMessages);
-  }, [selectedChatId]);
-
-  async function handleCreateDemoChat() {
     if (!user) return;
-    const chatId = await createDirectChat([user.uid], 'My chat');
-    setSelectedChatId(chatId);
-  }
+    return subscribeToFriends(user.uid, setFriends);
+  }, [user]);
 
-  async function handleSend(text: string) {
-    if (!user || !selectedChatId) return;
-    await sendMessage(selectedChatId, user.uid, user.displayName ?? 'User', text);
+  async function handleStartChat(friend: FriendItem) {
+    if (!user) return;
+
+    const chatId = await createDirectChat(
+      [user.uid, friend.id],
+      friend.displayName
+    );
+
+    navigate(`/chats/${chatId}`);
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
-      <Card title="Chats" subtitle="Direct and group conversations">
-        <div className="space-y-3">
-          <button onClick={handleCreateDemoChat} className="w-full rounded-2xl bg-brand-600 px-4 py-3 text-white">
-            Create chat
-          </button>
+    <div className="space-y-4">
+      <Card title="Chats" subtitle="Your conversations">
+        <button
+          onClick={() => setShowPicker(true)}
+          className="w-full rounded-2xl bg-brand-600 py-3 text-white"
+        >
+          Start chat
+        </button>
+
+        <div className="mt-4 space-y-3">
           {chats.map((chat) => (
             <button
               key={chat.id}
-              onClick={() => setSelectedChatId(chat.id)}
-              className={`w-full rounded-2xl border px-4 py-3 text-left ${selectedChatId === chat.id ? 'border-brand-300 bg-brand-50' : ''}`}
+              onClick={() => navigate(`/chats/${chat.id}`)}
+              className="w-full rounded-2xl border px-4 py-3 text-left"
             >
-              <div className="font-semibold text-slate-900">{chat.title}</div>
-              <div className="text-sm text-slate-500">{chat.isGroup ? 'Group chat' : 'Direct chat'}</div>
+              <div className="font-semibold text-slate-900">
+                {chat.title}
+              </div>
+              <div className="text-sm text-slate-500">
+                {chat.isGroup ? 'Group chat' : 'Direct chat'}
+              </div>
             </button>
           ))}
+
+          {!chats.length && (
+            <div className="text-sm text-slate-500">
+              No chats yet
+            </div>
+          )}
         </div>
       </Card>
 
-      <Card title="Conversation" subtitle="Real-time Firestore messages">
-        {selectedChatId ? <ChatWindow messages={messages} onSend={handleSend} /> : <div className="text-sm text-slate-500">Pick a chat.</div>}
-      </Card>
+      {showPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="mb-4 text-lg font-semibold">Select friend</h2>
+
+            {friends.map((friend) => (
+              <button
+                key={friend.id}
+                onClick={() => handleStartChat(friend)}
+                className="w-full border-b py-3 text-left"
+              >
+                {friend.displayName}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setShowPicker(false)}
+              className="mt-4 w-full rounded-xl bg-slate-200 py-2"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import FriendsPage from './pages/FriendsPage';
 import ChatsPage from './pages/ChatsPage';
 import GroupsPage from './pages/GroupsPage';
 import type { ReactElement } from 'react';
-
+import ChatRoomPage from './pages/ChatRoomPage';
 function ProtectedRoute({ children }: { children: ReactElement }) {
   const { user, loading } = useAuth();
 
@@ -36,6 +36,7 @@ export default function App() {
         <Route path="friends" element={<FriendsPage />} />
         <Route path="chats" element={<ChatsPage />} />
         <Route path="groups" element={<GroupsPage />} />
+        <Route path="/chats/:chatId" element={<ChatRoomPage />} />
       </Route>
     </Routes>
   );
